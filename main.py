@@ -9,9 +9,6 @@ from utils import args_checkers as checker
 
 def predict_mode(args):
     predictions = make_predicts(args.dir)
-    # for predict in predictions:
-    #     print(predict)
-
     df = pd.DataFrame.from_dict(predictions)
     df.to_csv(args.output)
 
@@ -33,6 +30,8 @@ if __name__ == "__main__":
                                 help='Путь до папки с аудиофайлами .wav')
     predict_parser.add_argument('-o', '--output', type=checker.filepath_checker, default='results.csv',
                                 help='Имя csv-файла для записи результатов классификации (По умолчанию: %(default)s)')
+    predict_parser.add_argument('-n', '--n_classes', choices=[2], default=2,
+                                help='Количество классов эмоций (По умолчанию: %(default)s)')
     predict_parser.set_defaults(func=predict_mode)
 
     train_parser = subparsers.add_parser('train', help='Дообучение модели')

@@ -15,16 +15,18 @@ import os
 import glob
 
 
-LABELS = ["positive", "sad"]
-feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained("facebook/hubert-base-ls960")
-model = HubertForSequenceClassification.from_pretrained(
-    'models/hubert-base-dusha-ft-bin-clf',
-    local_files_only=True,
-)
+BIN_LABELS = ["positive", "sad"]
+FULL_LABELS = ["angry", "neutral", "positive", "sad"]
+MODELS_LIST = [
+    "models/hubert-base-dusha-ft-bin-clf",
+]
 
 
-def label_to_emotion(label):
-    return LABELS[label]
+def label_to_emotion(label, n_classes=2):
+    if n_classes == 2:
+        return BIN_LABELS[label]
+
+    return FULL_LABELS[label]
 
 
 def predict(logits):
@@ -34,7 +36,14 @@ def predict(logits):
 
 
 def make_predicts(dirpath):
+    feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained("facebook/hubert-base-ls960")
+    model = HubertForSequenceClassification.from_pretrained(
+        MODELS_LIST[0],
+        local_files_only=True,
+    )
+
     print('Начало обработки')
+
     predicts = []
     abs_path = os.path.abspath(dirpath)
     for filepath in tqdm(glob.glob(f'{abs_path}/*.wav'), ncols=100):
