@@ -33,19 +33,42 @@ def get_input_values_for_triplets(batch, feature_extractor):
     return batch
 
 
+def load_data_for_test(filepath, dirpath, feature_extractor):
+    data_files = {"test": str(filepath)}
+    ds = load_data(data_files, dirpath, feature_extractor, read_audio_to_array, get_input_values)
+    return ds
+
+
 def load_data_for_clf_train(filepath, dirpath, feature_extractor):
-    ds = load_data(filepath, dirpath, feature_extractor, read_audio_to_array, get_input_values)
+    data_files = {"train": str(filepath)}
+    ds = load_data(data_files, dirpath, feature_extractor, read_audio_to_array, get_input_values)
     ds = ds.rename_column("label", "labels")
+
+    train_val = ds["train"].train_test_split(shuffle=True, test_size=0.1)
+
+    ds = DatasetDict({
+        'train': train_val['train'],
+        'val': train_val['test']
+    })
+
     return ds
 
 
 def load_data_for_triplet_train(filepath, dirpath, feature_extractor):
-    ds = load_data(filepath, dirpath, feature_extractor, read_triplets_to_arrays, get_input_values_for_triplets)
+    data_files = {"train": str(filepath)}
+    ds = load_data(data_files, dirpath, feature_extractor, read_triplets_to_arrays, get_input_values_for_triplets)
+
+    train_val = ds["train"].train_test_split(shuffle=True, test_size=0.1)
+
+    ds = DatasetDict({
+        'train': train_val['train'],
+        'val': train_val['test']
+    })
+
     return ds
 
 
-def load_data(filepath, dirpath, feature_extractor, read_audio_func, get_input_values_func):
-    data_files = {"train": str(filepath)}
+def load_data(data_files, dirpath, feature_extractor, read_audio_func, get_input_values_func):
     ds = load_dataset("csv", data_files=data_files)
 
     ds = ds.map(
@@ -58,11 +81,6 @@ def load_data(filepath, dirpath, feature_extractor, read_audio_func, get_input_v
         fn_kwargs={"feature_extractor": feature_extractor}
     )
 
-    train_val = ds["train"].train_test_split(shuffle=True, test_size=0.1)
-
-    ds = DatasetDict({
-        'train': train_val['train'],
-        'val': train_val['test']
-    })
+    ds.remove_columns("array")
 
     return ds

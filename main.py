@@ -5,6 +5,7 @@ import pandas as pd
 
 from inference import make_predicts
 from train import classification_train, triplet_train
+from test import test_model
 from utils import args_checkers as checker
 
 
@@ -24,6 +25,10 @@ def train_mode(args):
         triplet_train(args.file, args.dir, args.output, args.n_epochs, args.device)
 
 
+def test_mode(args):
+    test_model(args.file, args.dir, args.model)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Приложение для интеллектуального анализа эмоциональной речи')
     subparsers = parser.add_subparsers(title='Режимы работы',
@@ -40,11 +45,11 @@ if __name__ == "__main__":
     predict_parser.set_defaults(func=predict_mode)
 
     train_parser = subparsers.add_parser('train', help='Дообучение модели')
-    train_parser.add_argument('-d', '--dir', type=pathlib.Path, required=True,
+    train_parser.add_argument('-d', '--dir', type=checker.dirpath_checker, required=True,
                               help='Путь до папки с аудиофайлами .wav')
-    train_parser.add_argument('-f', '--file', type=pathlib.Path, required=True,
+    train_parser.add_argument('-f', '--file', type=checker.filepath_checker, required=True,
                               help='Путь до .csv файла с разметкой файлов по эмоциям')
-    train_parser.add_argument('--base_model', type=pathlib.Path, default='',
+    train_parser.add_argument('--base_model', type=checker.filepath_checker, default='',
                               help='Путь до папки базовой модели (По умолчанию: HuBERT Base')
     train_parser.add_argument('-n', '--n_classes', choices=[2], default=2,
                               help='Количество классов эмоций (По умолчанию: %(default)s)')
@@ -61,6 +66,15 @@ if __name__ == "__main__":
     train_parser.add_argument('--device', choices=['cpu', 'gpu'], default='gpu',
                               help='Устройство, на котором будет выполняться обучение (По умолчанию: %(default)s)')
     train_parser.set_defaults(func=train_mode)
+
+    test_parser = subparsers.add_parser('test', help='Тестирование модели')
+    test_parser.add_argument('-d', '--dir', type=checker.dirpath_checker, required=True,
+                             help='Путь до папки с аудиофайлами .wav')
+    test_parser.add_argument('-f', '--file', type=checker.filepath_checker, required=True,
+                             help='Путь до .csv файла с разметкой файлов по эмоциям')
+    test_parser.add_argument('-m', '--model', type=checker.dirpath_checker, required=True,
+                             help='Путь до модели классификации')
+    test_parser.set_defaults(func=test_mode)
 
     args = parser.parse_args()
     if not vars(args):
