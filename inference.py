@@ -17,9 +17,6 @@ import glob
 
 BIN_LABELS = ["positive", "sad"]
 FULL_LABELS = ["angry", "neutral", "positive", "sad"]
-MODELS_LIST = [
-    "models/hubert-base-dusha-ft-bin-clf",
-]
 
 
 def label_to_emotion(label, n_classes=2):
@@ -35,10 +32,10 @@ def predict(logits):
     return predicted_emotion
 
 
-def make_predicts(dirpath):
+def make_predicts(dirpath, model_path):
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained("facebook/hubert-base-ls960")
     model = HubertForSequenceClassification.from_pretrained(
-        MODELS_LIST[0],
+        model_path,
         local_files_only=True,
     )
 
@@ -49,7 +46,10 @@ def make_predicts(dirpath):
     for filepath in tqdm(glob.glob(f'{abs_path}/*.wav'), ncols=100):
         audio_array = get_audio_array(filepath)
         input_values = get_input_for_model(audio_array, feature_extractor)
-        logits = model(input_values).logits
+
+        with torch.no_grad():
+            logits = model(input_values).logits
+
         emotion = predict(logits)
         predicts.append({'file': os.path.basename(filepath), 'emotion': emotion})
 

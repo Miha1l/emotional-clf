@@ -10,7 +10,7 @@ from utils import args_checkers as checker
 
 
 def predict_mode(args):
-    predictions = make_predicts(args.dir)
+    predictions = make_predicts(args.dir, args.model)
     df = pd.DataFrame.from_dict(predictions)
     df.to_csv(args.output)
 
@@ -38,6 +38,8 @@ if __name__ == "__main__":
     predict_parser = subparsers.add_parser('predict', help='Классификация аудио')
     predict_parser.add_argument('-d', '--dir', type=checker.dirpath_checker, required=True,
                                 help='Путь до папки с аудиофайлами .wav')
+    predict_parser.add_argument('-m', '--model', type=checker.dirpath_checker, required=True,
+                                help='Путь до модели классификации')
     predict_parser.add_argument('-o', '--output', type=checker.filepath_checker, default='results.csv',
                                 help='Имя csv-файла для записи результатов классификации (По умолчанию: %(default)s)')
     predict_parser.add_argument('-n', '--n_classes', choices=[2], default=2,
