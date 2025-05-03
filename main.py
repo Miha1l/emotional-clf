@@ -4,6 +4,7 @@ import pathlib
 import pandas as pd
 
 from inference import make_predicts
+from train import classification_train, triplet_train
 from utils import args_checkers as checker
 
 
@@ -16,7 +17,11 @@ def predict_mode(args):
 
 
 def train_mode(args):
-    pass
+    if args.loss == 'CrossEntropy':
+        classification_train(args.file, args.dir, args.output, args.n_classes,
+                             args.epochs, args.device, args.lr, args.grad_accum_steps)
+    elif args.loss == 'TripletLoss':
+        triplet_train(args.file, args.dir, args.output, args.n_epochs, args.device)
 
 
 if __name__ == "__main__":
@@ -37,14 +42,25 @@ if __name__ == "__main__":
     train_parser = subparsers.add_parser('train', help='Дообучение модели')
     train_parser.add_argument('-d', '--dir', type=pathlib.Path, required=True,
                               help='Путь до папки с аудиофайлами .wav')
-    train_parser.add_argument('--epochs', type=int, default=5,
+    train_parser.add_argument('-f', '--file', type=pathlib.Path, required=True,
+                              help='Путь до .csv файла с разметкой файлов по эмоциям')
+    train_parser.add_argument('--base_model', type=pathlib.Path, default='',
+                              help='Путь до папки базовой модели (По умолчанию: HuBERT Base')
+    train_parser.add_argument('-n', '--n_classes', choices=[2], default=2,
+                              help='Количество классов эмоций (По умолчанию: %(default)s)')
+    train_parser.add_argument('-o', '--output', type=checker.filepath_checker, default='hubert-ft',
+                              help='Имя папки для записи модели (По умолчанию: %(default)s)')
+    train_parser.add_argument('-e', '--epochs', type=int, default=5,
                               help='Количество эпох обучения (По умолчанию: %(default)s)')
-    train_parser.add_argument('--arch', choices=['hubert'], default='hubert',
-                              help='Архитектура модели (По умолчанию: %(default)s)')
+    train_parser.add_argument('--grad_accum_steps', type=int, default=2,
+                              help='Количество шагов накопления градиента (По умолчанию: %(default)s)')
+    train_parser.add_argument('--lr', type=float, default=5e-5,
+                              help='Темп обучения (По умолчанию: %(default)s)')
     train_parser.add_argument('--loss', choices=['CrossEntropy', 'Triplet'], default='CrossEntropy',
                               help='Функция ошибки (По умолчанию: %(default)s)')
-    train_parser.add_argument('--device', choices=['cpu', 'gpu'], default='cpu',
+    train_parser.add_argument('--device', choices=['cpu', 'gpu'], default='gpu',
                               help='Устройство, на котором будет выполняться обучение (По умолчанию: %(default)s)')
+    train_parser.set_defaults(func=train_mode)
 
     args = parser.parse_args()
     if not vars(args):
