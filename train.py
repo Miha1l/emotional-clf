@@ -45,9 +45,9 @@ def triplet_train(filepath, dirpath, output_dir, n_epochs, device):
 
     unfreeze_model_layers(model, 2 + config.num_hidden_layers * 16)
 
-    if not torch.cuda.is_available() and device == 'GPU':
+    if not torch.cuda.is_available() and device == 'gpu':
         print('CUDA недоступна, обучение будет происходить на CPU')
-        device = 'CPU'
+        device = 'cpu'
 
     training_args = TrainingArguments(
         # output_dir=output_dir,
@@ -61,7 +61,7 @@ def triplet_train(filepath, dirpath, output_dir, n_epochs, device):
         learning_rate=5e-5,
         report_to='none',
         fp16=False,
-        use_cpu=True if device == 'CPU' else False,
+        use_cpu=True if device == 'cpu' else False,
     )
 
     data = load_data_for_triplet_train(filepath, dirpath, feature_extractor)
@@ -112,7 +112,7 @@ def classification_train(filepath, dirpath, output_dir, model_dir, n_labels, n_e
 
     if not torch.cuda.is_available() and device == 'gpu':
         print('CUDA недоступна, обучение будет происходить на CPU')
-        device = 'CPU'
+        device = 'cpu'
 
     training_args = TrainingArguments(
         # output_dir=output_dir,
@@ -126,7 +126,7 @@ def classification_train(filepath, dirpath, output_dir, model_dir, n_labels, n_e
         learning_rate=learning_rate,
         report_to='none',
         fp16=False,
-        use_cpu=True if device == 'CPU' else False,
+        use_cpu=True if device == 'cpu' else False,
     )
 
     data_collator = DataCollatorForClassification(
