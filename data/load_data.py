@@ -76,11 +76,11 @@ def load_data(data_files, dirpath, feature_extractor, read_audio_func, get_input
         fn_kwargs={"dirpath": dirpath}
     )
 
+    ds.remove_columns("array")
+
     ds = ds.map(
         get_input_values_func,
         fn_kwargs={"feature_extractor": feature_extractor}
     )
-
-    ds.remove_columns("array")
 
     return ds

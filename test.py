@@ -1,10 +1,12 @@
 from transformers import (
     HubertForSequenceClassification,
     Wav2Vec2FeatureExtractor,
+    AutoConfig,
 )
 
 from models import (
     compute_metrics,
+    HubertClassificationAfterTriplet,
 )
 
 from data import (
@@ -18,14 +20,31 @@ import torch
 import json
 
 
-def test_model(filepath, dirpath, model_dir):
-    model_id = "facebook/hubert-base-ls960"
-    feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_id)
-
-    model = HubertForSequenceClassification.from_pretrained(
+def get_model(model_dir):
+    config = AutoConfig.from_pretrained(
         model_dir,
         local_files_only=True,
     )
+
+    architecture = config.architectures[0]
+    if architecture == 'HubertClassificationAfterTriplet':
+        return HubertClassificationAfterTriplet.from_pretrained(
+            model_dir,
+            config=config,
+            local_files_only=True,
+        )
+
+    return HubertForSequenceClassification.from_pretrained(
+        model_dir,
+        local_files_only=True,
+    )
+
+
+def test_model(filepath, dirpath, model_dir, output):
+    model_id = "facebook/hubert-base-ls960"
+    feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_id)
+
+    model = get_model(model_dir)
 
     data = load_data_for_test(filepath, dirpath, feature_extractor)
     labels = np.array(data['test']['label'])
@@ -39,7 +58,7 @@ def test_model(filepath, dirpath, model_dir):
     print(metrics)
 
     metrics['model'] = model_dir
-    with open('metrics.json', 'w') as f:
+    with open(output, 'w') as f:
         json.dump(metrics, f, indent=4)
 
-    print('Результаты сохранены в файл metrics.json')
+    print(f'Результаты сохранены в файл {output}')

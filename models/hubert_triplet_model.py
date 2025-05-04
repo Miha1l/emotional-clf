@@ -92,7 +92,7 @@ class HubertClassificationAfterTriplet(HubertPreTrainedModel):
     def forward(
         self,
         input_values,
-        labels,
+        labels=None,
         attention_mask=None,
         output_attentions=None,
         output_hidden_states=None,
