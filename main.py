@@ -19,14 +19,14 @@ def predict_mode(args):
 
 def train_mode(args):
     if args.loss == 'CrossEntropy':
-        classification_train(args.file, args.dir, args.output, args.n_classes,
+        classification_train(args.file, args.dir, args.output, args.model, args.n_classes,
                              args.epochs, args.device, args.lr, args.grad_accum_steps)
     elif args.loss == 'TripletLoss':
         triplet_train(args.file, args.dir, args.output, args.n_epochs, args.device)
 
 
 def test_mode(args):
-    test_model(args.file, args.dir, args.model)
+    test_model(args.file, args.dir, args.model, args.output)
 
 
 if __name__ == "__main__":
@@ -51,8 +51,8 @@ if __name__ == "__main__":
                               help='Путь до папки с аудиофайлами .wav')
     train_parser.add_argument('-f', '--file', type=checker.filepath_checker, required=True,
                               help='Путь до .csv файла с разметкой файлов по эмоциям')
-    train_parser.add_argument('--base_model', type=checker.filepath_checker, default='',
-                              help='Путь до папки базовой модели (По умолчанию: HuBERT Base')
+    train_parser.add_argument('-m', '--model', type=checker.filepath_checker, default='',
+                              help='Путь до базовой модели (По умолчанию используется facebook/hubert-base-ls960')
     train_parser.add_argument('-n', '--n_classes', choices=[2], default=2,
                               help='Количество классов эмоций (По умолчанию: %(default)s)')
     train_parser.add_argument('-o', '--output', type=checker.filepath_checker, default='hubert-ft',
@@ -76,6 +76,8 @@ if __name__ == "__main__":
                              help='Путь до .csv файла с разметкой файлов по эмоциям')
     test_parser.add_argument('-m', '--model', type=checker.dirpath_checker, required=True,
                              help='Путь до модели классификации')
+    test_parser.add_argument('-o', '--output', type=checker.dirpath_checker, default='metrics.json',
+                             help='Имя json-файла для сохранения метрик (По умолчанию: %(default)s)')
     test_parser.set_defaults(func=test_mode)
 
     args = parser.parse_args()

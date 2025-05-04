@@ -8,6 +8,7 @@ from transformers import (
 
 from models import (
     HubertForTripletTrain,
+    HubertClassificationAfterTriplet,
     compute_metrics,
 )
 
@@ -49,13 +50,13 @@ def triplet_train(filepath, dirpath, output_dir, n_epochs, device):
         device = 'CPU'
 
     training_args = TrainingArguments(
-        output_dir=output_dir,
+        # output_dir=output_dir,
         num_train_epochs=n_epochs,
-        gradient_accumulation_steps=4,
-        per_device_train_batch_size=8,
+        per_device_train_batch_size=4,
+        gradient_accumulation_steps=2,
         per_device_eval_batch_size=4,
         save_strategy='no',
-        logging_steps=10,
+        logging_strategy='epoch',
         eval_strategy='epoch',
         learning_rate=5e-5,
         report_to='none',
@@ -69,40 +70,52 @@ def triplet_train(filepath, dirpath, output_dir, n_epochs, device):
     )
 
     print("Обучение с использованием триплетной потери")
-    train(model, data, data_collator, training_args, "")
-    # unfreeze_model_layers(model, 2)
-    # data = load_data_for_clf_train(filepath, dirpath, feature_extractor)
-    # data_collator = DataCollatorForClassification(
-    #     processor=feature_extractor,
-    # )
-    #
-    # print("Обучение классификатора")
-    # train(model, data, data_collator, training_args, output_dir)
+    train(model, data, data_collator, training_args, output_dir)
 
 
-def classification_train(filepath, dirpath, output_dir, n_labels, n_epochs, device, learning_rate, grad_accum_steps):
-    model_id = "facebook/hubert-base-ls960"
-    feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_id)
+def get_model_for_clf(model_dir, n_labels):
+    model_id = 'facebook/hubert-base-ls960' if model_dir == '' else model_dir
 
     config = AutoConfig.from_pretrained(
         model_id,
         num_labels=n_labels,
     )
 
-    model = HubertForSequenceClassification.from_pretrained(
+    is_local_file = model_dir == ''
+    architecture = config.architectures[0]
+    if architecture == 'HubertForTripletTrain':
+        return HubertClassificationAfterTriplet.from_pretrained(
+            model_id,
+            config=config,
+            ignore_mismatched_sizes=True,
+            local_files_only=is_local_file,
+        )
+
+    return HubertForSequenceClassification.from_pretrained(
         model_id,
         config=config,
-        ignore_mismatched_sizes=True
+        ignore_mismatched_sizes=True,
+        local_files_only=is_local_file,
     )
 
-    unfreeze_model_layers(model, 4 + config.num_hidden_layers * 16)
+
+def classification_train(filepath, dirpath, output_dir, model_dir, n_labels, n_epochs, device, learning_rate, grad_accum_steps):
+    model_id = 'facebook/hubert-base-ls960'
+    feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_id)
+
+    model = get_model_for_clf(model_dir, n_labels)
+
+    if isinstance(model, HubertClassificationAfterTriplet):
+        unfreeze_model_layers(model, 2)
+    else:
+        unfreeze_model_layers(model, 4 + model.config.num_hidden_layers * 16)
 
     if not torch.cuda.is_available() and device == 'gpu':
         print('CUDA недоступна, обучение будет происходить на CPU')
         device = 'CPU'
 
     training_args = TrainingArguments(
-        output_dir=output_dir,
+        # output_dir=output_dir,
         num_train_epochs=n_epochs,
         per_device_train_batch_size=4,
         gradient_accumulation_steps=grad_accum_steps,
