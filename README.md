@@ -18,7 +18,9 @@ python main.py predict -d ./samples -m ./trained_models/hubert-base-dusha-ft-bin
 ### Режим train
 
 В этом режиме происходит дообучение модели HuBERT Base для бинарной классификации.
-Перед запуском необходимо подготовить `.csv` файл в следующем формате:
+Перед запуском необходимо подготовить `.csv` файл в формате, зависящим от выбранной функции потерь:
+
+_CrossEntropy_:
 
 | audio       | label |
 |-------------|-------|
@@ -26,6 +28,13 @@ python main.py predict -d ./samples -m ./trained_models/hubert-base-dusha-ft-bin
 | sample2.wav | 1     |
 
 Где 0 соответствует эмоции радости, 1 - печали.
+
+_Triplet_:
+
+| anchor        | positive      | negative      |
+|---------------|---------------|---------------|
+| positive1.wav | positive2.wav | sad1.wav      |
+| sad1.wav      | sad2.wav      | positive2.wav |
 
 Пример запуска:
 
@@ -37,7 +46,7 @@ python main.py train -d ./samples -o train.csv --epochs 8
 
 В этом режиме происходит тестирование переданной модели классификации.
 Перед запуском необходимо подготовить `.csv` файл в формате, аналогичном формату для обучения.
-Расчитываемые метрики: Accuracy, Recall, Precision, F1
+Расчитываемые метрики: Accuracy, Recall, Precision, F1. Метрики сохраняются по умолчанию в файл `metrics.json`.
 
 Пример запуска:
 
