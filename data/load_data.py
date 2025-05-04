@@ -43,6 +43,7 @@ def load_data_for_clf_train(filepath, dirpath, feature_extractor):
     data_files = {"train": str(filepath)}
     ds = load_data(data_files, dirpath, feature_extractor, read_audio_to_array, get_input_values)
     ds = ds.rename_column("label", "labels")
+    ds = ds.remove_columns("array")
 
     train_val = ds["train"].train_test_split(shuffle=True, test_size=0.1)
 
@@ -75,8 +76,6 @@ def load_data(data_files, dirpath, feature_extractor, read_audio_func, get_input
         read_audio_func,
         fn_kwargs={"dirpath": dirpath}
     )
-
-    ds.remove_columns("array")
 
     ds = ds.map(
         get_input_values_func,
