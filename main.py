@@ -76,7 +76,7 @@ if __name__ == "__main__":
                              help='Путь до .csv файла с разметкой файлов по эмоциям')
     test_parser.add_argument('-m', '--model', type=checker.dirpath_checker, required=True,
                              help='Путь до модели классификации')
-    test_parser.add_argument('-o', '--output', type=checker.dirpath_checker, default='metrics.json',
+    test_parser.add_argument('-o', '--output', type=checker.filepath_checker, default='metrics.json',
                              help='Имя json-файла для сохранения метрик (По умолчанию: %(default)s)')
     test_parser.set_defaults(func=test_mode)
 
