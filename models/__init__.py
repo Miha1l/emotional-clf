@@ -4,5 +4,8 @@ from models.hubert_triplet_model import (
 )
 
 from models.metrics import (
-    compute_metrics
+    compute_metrics,
+    roc_auc_plot,
+    confusion_matrix_plot,
+    metrics_plot,
 )

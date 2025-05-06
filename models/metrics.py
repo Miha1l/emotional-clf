@@ -3,8 +3,11 @@ from sklearn.metrics import (
     f1_score,
     precision_score,
     recall_score,
+    RocCurveDisplay,
+    ConfusionMatrixDisplay,
 )
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -23,3 +26,19 @@ def compute_metrics(eval_pred):
         "precision": precision,
         "f1": f1
     }
+
+
+def metrics_plot(y_true, y_pred):
+    RocCurveDisplay.from_predictions(y_true, y_pred)
+    ConfusionMatrixDisplay.from_predictions(y_true, y_pred)
+    plt.show()
+
+
+def roc_auc_plot(y_true, y_pred):
+    RocCurveDisplay.from_predictions(y_true, y_pred)
+    plt.show()
+
+
+def confusion_matrix_plot(y_true, y_pred):
+    ConfusionMatrixDisplay.from_predictions(y_true, y_pred)
+    plt.show()

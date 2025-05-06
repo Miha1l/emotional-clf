@@ -6,6 +6,7 @@ from transformers import (
 
 from models import (
     compute_metrics,
+    metrics_plot,
     HubertClassificationAfterTriplet,
 )
 
@@ -62,3 +63,6 @@ def test_model(filepath, dirpath, model_dir, output):
         json.dump(metrics, f, indent=4)
 
     print(f'Результаты сохранены в файл {output}')
+
+    predictions = np.argmax(logits, axis=-1)
+    metrics_plot(labels, predictions)
