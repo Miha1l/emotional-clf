@@ -30,8 +30,8 @@ def unfreeze_model_layers(model, n_layers):
         param.requires_grad = True
 
 
-def triplet_train(filepath, dirpath, output_dir, n_epochs, batch_size, grad_accum_steps, device):
-    model_id = "facebook/hubert-base-ls960"
+def triplet_train(filepath, dirpath, output_dir, model_dir, n_epochs, batch_size, grad_accum_steps, device):
+    model_id = "facebook/hubert-base-ls960" if model_dir == "" else model_dir
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_id)
 
     config = AutoConfig.from_pretrained(

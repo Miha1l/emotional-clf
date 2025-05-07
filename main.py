@@ -23,8 +23,9 @@ def train_mode(args):
                              n_labels=args.n_classes, n_epochs=args.epochs, batch_size=args.batch, device=args.device,
                              learning_rate=args.lr, grad_accum_steps=args.grad_accum_steps)
     elif args.loss == 'TripletLoss':
-        triplet_train(filepath=args.file, dirpath=args.dir, output_dir=args.output, n_epochs=args.n_epochs,
-                      batch_size=args.batch, device=args.device, grad_accum_steps=args.grad_accum_steps)
+        triplet_train(filepath=args.file, dirpath=args.dir, output_dir=args.output,
+                      model_dir=args.model, n_epochs=args.n_epochs, batch_size=args.batch,
+                      device=args.device, grad_accum_steps=args.grad_accum_steps)
 
 
 def test_mode(args):
