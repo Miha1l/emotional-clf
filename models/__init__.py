@@ -1,6 +1,6 @@
 from models.hubert_triplet_model import (
     HubertForTripletTrain,
-    HubertClassificationAfterTriplet,
+    HubertTripletClassification,
 )
 
 from models.metrics import (

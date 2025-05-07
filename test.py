@@ -7,7 +7,7 @@ from transformers import (
 from models import (
     compute_metrics,
     metrics_plot,
-    HubertClassificationAfterTriplet,
+    HubertTripletClassification,
 )
 
 from data import (
@@ -28,8 +28,8 @@ def get_model(model_dir):
     )
 
     architecture = config.architectures[0]
-    if architecture == 'HubertClassificationAfterTriplet':
-        return HubertClassificationAfterTriplet.from_pretrained(
+    if architecture == 'HubertTripletClassification':
+        return HubertTripletClassification.from_pretrained(
             model_dir,
             config=config,
             local_files_only=True,

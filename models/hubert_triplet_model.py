@@ -77,7 +77,7 @@ class HubertForTripletTrain(HubertPreTrainedModel):
         )
 
 
-class HubertClassificationAfterTriplet(HubertPreTrainedModel):
+class HubertTripletClassification(HubertPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
 

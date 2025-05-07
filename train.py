@@ -8,7 +8,7 @@ from transformers import (
 
 from models import (
     HubertForTripletTrain,
-    HubertClassificationAfterTriplet,
+    HubertTripletClassification,
     compute_metrics,
 )
 
@@ -30,7 +30,7 @@ def unfreeze_model_layers(model, n_layers):
         param.requires_grad = True
 
 
-def triplet_train(filepath, dirpath, output_dir, n_epochs, device):
+def triplet_train(filepath, dirpath, output_dir, n_epochs, batch_size, grad_accum_steps, device):
     model_id = "facebook/hubert-base-ls960"
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_id)
 
@@ -52,8 +52,8 @@ def triplet_train(filepath, dirpath, output_dir, n_epochs, device):
     training_args = TrainingArguments(
         # output_dir=output_dir,
         num_train_epochs=n_epochs,
-        per_device_train_batch_size=4,
-        gradient_accumulation_steps=2,
+        per_device_train_batch_size=batch_size,
+        gradient_accumulation_steps=grad_accum_steps,
         per_device_eval_batch_size=4,
         save_strategy='no',
         logging_strategy='epoch',
@@ -84,7 +84,7 @@ def get_model_for_clf(model_dir, n_labels):
     is_local_file = model_dir == ''
     architecture = config.architectures[0]
     if architecture == 'HubertForTripletTrain':
-        return HubertClassificationAfterTriplet.from_pretrained(
+        return HubertTripletClassification.from_pretrained(
             model_id,
             config=config,
             ignore_mismatched_sizes=True,
@@ -99,13 +99,14 @@ def get_model_for_clf(model_dir, n_labels):
     )
 
 
-def classification_train(filepath, dirpath, output_dir, model_dir, n_labels, n_epochs, device, learning_rate, grad_accum_steps):
+def classification_train(filepath, dirpath, output_dir, model_dir, n_labels, n_epochs, batch_size,
+                         device, learning_rate, grad_accum_steps):
     model_id = 'facebook/hubert-base-ls960'
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_id)
 
     model = get_model_for_clf(model_dir, n_labels)
 
-    if isinstance(model, HubertClassificationAfterTriplet):
+    if isinstance(model, HubertTripletClassification):
         unfreeze_model_layers(model, 2)
     else:
         unfreeze_model_layers(model, 4 + model.config.num_hidden_layers * 16)
@@ -117,7 +118,7 @@ def classification_train(filepath, dirpath, output_dir, model_dir, n_labels, n_e
     training_args = TrainingArguments(
         # output_dir=output_dir,
         num_train_epochs=n_epochs,
-        per_device_train_batch_size=4,
+        per_device_train_batch_size=batch_size,
         gradient_accumulation_steps=grad_accum_steps,
         per_device_eval_batch_size=4,
         save_strategy='no',

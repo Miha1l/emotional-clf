@@ -19,10 +19,12 @@ def predict_mode(args):
 
 def train_mode(args):
     if args.loss == 'CrossEntropy':
-        classification_train(args.file, args.dir, args.output, args.model, args.n_classes,
-                             args.epochs, args.device, args.lr, args.grad_accum_steps)
+        classification_train(filepath=args.file, dirpath=args.dir, output_dir=args.output, model_dir=args.model,
+                             n_labels=args.n_classes, n_epochs=args.epochs, batch_size=args.batch, device=args.device,
+                             learning_rate=args.lr, grad_accum_steps=args.grad_accum_steps)
     elif args.loss == 'TripletLoss':
-        triplet_train(args.file, args.dir, args.output, args.n_epochs, args.device)
+        triplet_train(filepath=args.file, dirpath=args.dir, output_dir=args.output, n_epochs=args.n_epochs,
+                      batch_size=args.batch, device=args.device, grad_accum_steps=args.grad_accum_steps)
 
 
 def test_mode(args):
@@ -59,6 +61,8 @@ if __name__ == "__main__":
                               help='Имя папки для записи модели (По умолчанию: %(default)s)')
     train_parser.add_argument('-e', '--epochs', type=int, default=5,
                               help='Количество эпох обучения (По умолчанию: %(default)s)')
+    train_parser.add_argument('--batch', type=int, default=4,
+                              help='Размер обучающего батча (По умолчанию: %(default)s)')
     train_parser.add_argument('--grad_accum_steps', type=int, default=2,
                               help='Количество шагов накопления градиента (По умолчанию: %(default)s)')
     train_parser.add_argument('--lr', type=float, default=5e-5,
