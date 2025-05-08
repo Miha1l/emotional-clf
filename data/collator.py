@@ -33,10 +33,9 @@ class DataCollatorForClassification:
     max_length: Optional[int] = None
 
     def __call__(
-        self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
+            self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
     ) -> Dict[str, torch.Tensor]:
-
-        input_features = [ {"input_values": feature["input_values"]} for feature in features ]
+        input_features = [{"input_values": feature["input_values"]} for feature in features]
         labels = [feature["labels"] for feature in features]
 
         max_len = max(map(get_len, input_features))
@@ -50,7 +49,7 @@ class DataCollatorForClassification:
 
 
 @dataclass
-class DataCollatorForTripletTrain:
+class DataCollatorForTriplets:
     processor: Wav2Vec2Processor
     padding: Union[bool, str] = True
     return_attention_mask: bool = False
@@ -59,7 +58,6 @@ class DataCollatorForTripletTrain:
     def __call__(
             self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
     ) -> Dict[str, torch.Tensor]:
-
         anchor_input = [{"input_values": feature["anchor_input_values"]} for feature in features]
         positive_input = [{"input_values": feature["positive_input_values"]} for feature in features]
         negative_input = [{"input_values": feature["negative_input_values"]} for feature in features]

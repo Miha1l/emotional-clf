@@ -1,5 +1,4 @@
 from transformers import (
-    HubertForSequenceClassification,
     AutoConfig,
     Trainer,
     TrainingArguments,
@@ -15,7 +14,7 @@ from models import (
 
 from data import (
     DataCollatorForClassification,
-    DataCollatorForTripletTrain,
+    DataCollatorForTriplets,
     load_data_for_clf_train,
     load_data_for_triplet_train,
 )
@@ -66,7 +65,7 @@ def triplet_train(filepath, dirpath, output_dir, model_dir, n_epochs, batch_size
     )
 
     data = load_data_for_triplet_train(filepath, dirpath, feature_extractor)
-    data_collator = DataCollatorForTripletTrain(
+    data_collator = DataCollatorForTriplets(
         processor=feature_extractor,
     )
 

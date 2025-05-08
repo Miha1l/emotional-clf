@@ -36,6 +36,7 @@ def get_input_values_for_triplets(batch, feature_extractor):
 def load_data_for_test(filepath, dirpath, feature_extractor):
     data_files = {"test": str(filepath)}
     ds = load_data(data_files, dirpath, feature_extractor, read_audio_to_array, get_input_values)
+    ds = ds.remove_columns("array")
     return ds
 
 

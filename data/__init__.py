@@ -1,6 +1,6 @@
 from data.collator import (
     DataCollatorForClassification,
-    DataCollatorForTripletTrain
+    DataCollatorForTriplets
 )
 
 from data.load_data import (
