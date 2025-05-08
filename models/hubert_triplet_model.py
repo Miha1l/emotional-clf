@@ -4,14 +4,12 @@ from transformers import (
 )
 from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.utils.generic import ModelOutput
+from torch.nn import CrossEntropyLoss, TripletMarginLoss
+from dataclasses import dataclass
+from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
-
-from torch.nn import CrossEntropyLoss, TripletMarginLoss
-
-from dataclasses import dataclass
-from typing import Optional, Tuple
 
 
 @dataclass

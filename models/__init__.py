@@ -9,3 +9,7 @@ from models.metrics import (
     confusion_matrix_plot,
     metrics_plot,
 )
+
+from models.get_model import (
+    get_model_for_clf_train
+)

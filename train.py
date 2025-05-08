@@ -10,6 +10,7 @@ from models import (
     HubertForTripletTrain,
     HubertTripletClassification,
     compute_metrics,
+    get_model_for_clf_train,
 )
 
 from data import (
@@ -73,38 +74,12 @@ def triplet_train(filepath, dirpath, output_dir, model_dir, n_epochs, batch_size
     train(model, data, data_collator, training_args, output_dir)
 
 
-def get_model_for_clf(model_dir, n_labels):
-    model_id = 'facebook/hubert-base-ls960' if model_dir == '' else model_dir
-
-    config = AutoConfig.from_pretrained(
-        model_id,
-        num_labels=n_labels,
-    )
-
-    is_local_file = model_dir == ''
-    architecture = config.architectures[0]
-    if architecture == 'HubertForTripletTrain':
-        return HubertTripletClassification.from_pretrained(
-            model_id,
-            config=config,
-            ignore_mismatched_sizes=True,
-            local_files_only=is_local_file,
-        )
-
-    return HubertForSequenceClassification.from_pretrained(
-        model_id,
-        config=config,
-        ignore_mismatched_sizes=True,
-        local_files_only=is_local_file,
-    )
-
-
 def classification_train(filepath, dirpath, output_dir, model_dir, n_labels, n_epochs, batch_size,
                          device, learning_rate, grad_accum_steps):
     model_id = 'facebook/hubert-base-ls960'
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_id)
 
-    model = get_model_for_clf(model_dir, n_labels)
+    model = get_model_for_clf_train(model_dir, n_labels)
 
     if isinstance(model, HubertTripletClassification):
         unfreeze_model_layers(model, 2)
