@@ -1,5 +1,4 @@
 from transformers import (
-    HubertForSequenceClassification,
     Wav2Vec2FeatureExtractor
 )
 
@@ -7,6 +6,8 @@ from utils import (
     get_input_for_model,
     get_audio_array
 )
+
+from models import get_model_for_test
 
 from tqdm import tqdm
 
@@ -34,10 +35,7 @@ def predict(logits):
 
 def make_predicts(dirpath, model_path):
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained("facebook/hubert-base-ls960")
-    model = HubertForSequenceClassification.from_pretrained(
-        model_path,
-        local_files_only=True,
-    )
+    model = get_model_for_test(model_path)
 
     print('Начало обработки')
 

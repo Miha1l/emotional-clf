@@ -1,13 +1,11 @@
 from transformers import (
-    HubertForSequenceClassification,
     Wav2Vec2FeatureExtractor,
-    AutoConfig,
 )
 
 from models import (
     compute_metrics,
     metrics_plot,
-    HubertTripletClassification,
+    get_model_for_test,
 )
 
 from data import (
@@ -21,31 +19,10 @@ import torch
 import json
 
 
-def get_model(model_dir):
-    config = AutoConfig.from_pretrained(
-        model_dir,
-        local_files_only=True,
-    )
-
-    architecture = config.architectures[0]
-    if architecture == 'HubertTripletClassification':
-        return HubertTripletClassification.from_pretrained(
-            model_dir,
-            config=config,
-            local_files_only=True,
-        )
-
-    return HubertForSequenceClassification.from_pretrained(
-        model_dir,
-        local_files_only=True,
-    )
-
-
 def test_model(filepath, dirpath, model_dir, output):
     model_id = "facebook/hubert-base-ls960"
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(model_id)
-
-    model = get_model(model_dir)
+    model = get_model_for_test(model_dir)
 
     data = load_data_for_test(filepath, dirpath, feature_extractor)
     labels = np.array(data['test']['label'])

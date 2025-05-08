@@ -32,3 +32,24 @@ def get_model_for_clf_train(model_dir, n_labels):
         ignore_mismatched_sizes=True,
         local_files_only=is_local_file,
     )
+
+
+def get_model_for_test(model_dir):
+    config = AutoConfig.from_pretrained(
+        model_dir,
+        local_files_only=True,
+    )
+
+    architecture = config.architectures[0]
+    if architecture == 'HubertTripletClassification':
+        return HubertTripletClassification.from_pretrained(
+            model_dir,
+            config=config,
+            local_files_only=True,
+        )
+
+    return HubertForSequenceClassification.from_pretrained(
+        model_dir,
+        config=config,
+        local_files_only=True,
+    )

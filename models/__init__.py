@@ -11,5 +11,6 @@ from models.metrics import (
 )
 
 from models.get_model import (
-    get_model_for_clf_train
+    get_model_for_clf_train,
+    get_model_for_test,
 )
