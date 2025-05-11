@@ -16,21 +16,21 @@ import os
 import glob
 
 
-BIN_LABELS = ["positive", "sad"]
-FULL_LABELS = ["angry", "neutral", "positive", "sad"]
-
-
-def label_to_emotion(label, n_classes=2):
-    if n_classes == 2:
-        return BIN_LABELS[label]
-
-    return FULL_LABELS[label]
+# BIN_LABELS = ["positive", "sad"]
+# FULL_LABELS = ["angry", "neutral", "positive", "sad"]
+#
+#
+# def label_to_emotion(label, n_classes=2):
+#     if n_classes == 2:
+#         return BIN_LABELS[label]
+#
+#     return FULL_LABELS[label]
 
 
 def predict(logits):
     predictions = torch.argmax(logits, dim=-1)
-    predicted_emotion = label_to_emotion(predictions.numpy()[0])
-    return predicted_emotion
+    # predicted_emotion = label_to_emotion(predictions.numpy()[0])
+    return predictions.numpy()[0]
 
 
 def make_predicts(dirpath, model_path):
@@ -48,7 +48,7 @@ def make_predicts(dirpath, model_path):
         with torch.no_grad():
             logits = model(input_values).logits
 
-        emotion = predict(logits)
-        predicts.append({'file': os.path.basename(filepath), 'emotion': emotion})
+        label = predict(logits)
+        predicts.append({'file': os.path.basename(filepath), 'label': label})
 
     return predicts
