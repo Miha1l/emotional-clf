@@ -22,9 +22,9 @@ def train_mode(args):
         classification_train(filepath=args.file, dirpath=args.dir, output_dir=args.output, model_dir=args.model,
                              n_labels=args.n_classes, n_epochs=args.epochs, batch_size=args.batch, device=args.device,
                              learning_rate=args.lr, grad_accum_steps=args.grad_accum_steps)
-    elif args.loss == 'TripletLoss':
+    elif args.loss == 'Triplet':
         triplet_train(filepath=args.file, dirpath=args.dir, output_dir=args.output,
-                      model_dir=args.model, n_epochs=args.n_epochs, batch_size=args.batch,
+                      model_dir=args.model, n_epochs=args.epochs, batch_size=args.batch,
                       device=args.device, grad_accum_steps=args.grad_accum_steps)
 
 
