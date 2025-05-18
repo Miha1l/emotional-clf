@@ -4,6 +4,15 @@
 для задачи классификации эмоций на примере датасета Dusha.
 В данный момент приложения поддерживает только бинарную классификацию на эмоции радости и печали.
 
+## Обученные модели
+
+Для обучения использовался набор данных [Dusha(crowd)](https://github.com/salute-developers/golos/tree/master/dusha#dusha-dataset)
+
+| Описание модели                              | Ссылка                                                                                                       |
+|----------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| Модель для классификации                     | [hubert-clf](https://drive.google.com/file/d/1xiTUK7hO8Q4JNrZjVdhcRla8mHE4poJ7/view?usp=drive_link)          |
+| Модель классификации, обученная на триплетах | [hubert-triplets-clf](https://drive.google.com/file/d/1GhvEO9ipMNiNR4EcWEKjnpJpV82PPEb_/view?usp=drive_link) |
+
 ## Использование приложения
 ### Режим predict
 
